@@ -1,0 +1,71 @@
+! Example MagIC namelist for an inertial-wave simulation at Ek = 1e-6.
+! Taken from de Langen et al. (submitted). See README for context.
+!
+! Key parameters:
+!   Ekman number      Ek  = 1e-6
+!   Magnetic Prandtl  Pm  = 6.28e-6  (Rm = 1)
+!   Radius ratio      eta = 0.91
+!   Forcing frequency omega/Omega = 1  (inertial wave regime)
+!                     corresponding to freq_imp = 1/(2*pi*Ek) = 1.5915e5
+
+! Starting from restart file 'checkpoint_end.ek1e-6_init'
+
+&grid
+  n_r_max       = 121,
+  n_cheb_max    = 120,
+  n_phi_tot     = 192,
+/
+
+&control
+  mode         = 0,
+  tag          = "ek1e-6_freq1.5e5_rm1",
+  n_time_steps = 2000000,
+  dtMax        = 1.0E-08,
+  runHours     = 16,
+  l_update_v   = .true.,
+  l_update_b   = .true.,
+  radial_scheme= "CHEB",
+  time_scheme  = "CNAB2",
+/
+
+&phys_param
+  ra        = 0.0,
+  ek        = 1.0E-06,
+  prmag     = 6.283190E-06,
+  radratio  = 0.91,
+  strat     = 0.0,
+  ktopv     = 2,
+  kbotv     = 2,
+  ktopb     = 1,
+  kbotb     = 1,
+/
+
+&B_external
+  n_imp    = 8,
+  l_imp    = 1,
+  amp_imp  = 5.0E-07,
+  freq_imp = 1.591549E+05,
+  phi0     = 0.0,
+/
+
+&start_field
+  l_start_file = .true.,
+  start_file   = "checkpoint_end.ek1e-6_init",
+/
+
+&output_control
+  n_graphs    = 30,
+  n_specs     = 2,
+  n_rsts      = 1,
+  n_TOs       = 2,
+  n_pots      = 2,
+  n_cmbs      = 50,
+  n_logs      = 10000,
+  l_average   = .true.,
+  l_cmb_field = .true.,
+  l_iner      = .true.,
+  l_par       = .true.,
+  l_RMS       = .true.,
+  l_TO        = .true.,
+/
+

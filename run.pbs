@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --job-name=magic_run              # Job name
+#SBATCH --partition=swan                  # Partition (MPS swan HPC cluster, AMD EPYC 7763, 128 cores/node)
+#SBATCH --qos=swan_default
+#SBATCH --account=planets
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --ntasks-per-node=120            # Number of MPI ranks
+#SBATCH --time=12:10:00                  # Wall time limit (hh:mm:ss)
+#SBATCH --mem=256G
+#SBATCH --mail-type=END,FAIL
+#SBATCH -o run_%j.out                    # Standard output
+#SBATCH -e run_%j.err                    # Standard error
+#SBATCH --export=ALL
+
+# Modules required for MagIC (GCC build)
+MODULES="GCC/12.3.0 OpenMPI/4.1.5 FFTW.MPI/3.3.10 ScaLAPACK/2.2.0-fb"
+. $MODULESHOME/init/bash
+module load $MODULES
+
+mpirun ~/magic_swan_gcc/magic/build/magic.exe input.nml
+
+module unload $MODULES
