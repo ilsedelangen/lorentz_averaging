@@ -6,7 +6,7 @@ Code developed for my PhD thesis *"Modelling Magnetic Induction and Lorentz Forc
 
 Europa's ocean is subject to Jupiter's oscillating magnetic field, which induces electrical currents, leading to a Lorentz force. This force has a small time-averaged component that can drive a zonal, westward flow. Because the instantaneous Lorentz force oscillates at the forcing frequency, accurate time-averaging is essential to isolate the small net contribution that drives the flow.
 
-The simulations were run using [MagIC](https://github.com/magic-sph/magic), an open-source spectral code for magnetohydrodynamic simulations in spherical geometry.
+The simulations were run using [MagIC](https://github.com/magic-sph/magic), an open-source spectral code for magnetohydrodynamic simulations in spherical geometry. Documentation can be found [here](https://magic-sph.github.io/postProc.html).
 
 ## What I contributed to MagIC
 
@@ -62,7 +62,7 @@ Approximately 150 simulations were run, varying Ek (1e-7 to 1e-3), Pm (1e-5 to 1
 **Fortran:** these files are designed to be compiled as part of MagIC and depend on MagIC internal modules (`precision_mod`, `radial_data`, `truncation`, `constants`). They are not standalone.
 
 **Python:**
-- [MagIC Python post-processing library](https://magic-sph.github.io/apidoc.html)
+- [MagIC Python post-processing library](https://magic-sph.github.io/postProc.html)
 - `numpy`, `matplotlib`, `scipy`
 
 ## Figure
