@@ -25,6 +25,7 @@ FONT_MEDIUM = 19
 FONT_SMALL  = 18
 MARKER_SIZE = 10
 
+# Colorblind-friendly palette
 EK_COLORS = {
     1e-4: "#0072B2",
     1e-5: "#E69F00",
@@ -36,41 +37,44 @@ EK_COLORS = {
 SIM_DIR = "/scratch/delangen/magic_runs"
 
 # ── Run definitions ───────────────────────────────────────────────────────────
-# For zonal flow regime (ZF). Each entry is (ek, freq, b). Directories are derived via get_run_path().
-
+# Zonal flow runs (omega/Omega = 7.59). Each entry is (ek, freq, b, rm).
 ZF_RUNS = [
-    (1e-4, 7590, 5e-6),
-    (1e-4, 7590, 5e-7),
-    (1e-4, 7590, 5e-8),
-    (1e-5,  759, 5e-6),
-    (1e-5,  759, 5e-7),
-    (1e-5,  759, 5e-8),
-    (1e-6,   76, 5e-6),
-    (1e-6,   76, 5e-7),
-    (1e-6,   76, 5e-8),
-    (1e-7,  7.6, 5e-7),
+    (1e-4, 1.2080e4, 5e-6, 1),
+    (1e-4, 1.2080e4, 5e-7, 1),
+    (1e-4, 1.2080e4, 5e-8, 1),
+    (1e-5, 1.2080e5, 5e-6, 1),
+    (1e-5, 1.2080e5, 5e-7, 1),
+    (1e-5, 1.2080e5, 5e-8, 1),
+    (1e-6, 1.2080e6, 5e-6, 1),
+    (1e-6, 1.2080e6, 5e-7, 1),
+    (1e-6, 1.2080e6, 5e-8, 1),
+    (1e-7, 1.2080e7, 5e-7, 1),
 ]
 
-# For inertial wave regime (IW). Each entry is (ek, freq, b, is_orbital).
+# Inertial wave runs (omega/Omega = 1). Each entry is (ek, freq, b, rm, is_orbital).
 # is_orbital=True for runs at the orbital frequency rather than the synodic frequency.
 IW_RUNS = [
-    (1e-4, 1592,  5e-7, False),
-    (1e-5,  159,  5e-7, False),
-    (1e-5,  159,  5e-6, False),
-    (1e-5,  159,  5e-8, False),
-    (1e-6,  15.9, 5e-7, False),
-    (1e-6,  15.9, 5e-6, False),
-    (1e-6,  15.9, 5e-8, False),
-    (1e-7,  1.59, 5e-7, False),
-    (1e-4,  159,  5e-7, True),
-    (1e-5,  15.9, 5e-7, True),
+    (1e-4, 1.5915e3, 5e-7,  1,    False),
+    (1e-4, 1.5915e3, 5e-7,  15.9, False),
+    (1e-5, 1.5915e4, 5e-7,  1,    False),
+    (1e-5, 1.5915e4, 5e-6,  1,    False),
+    (1e-5, 1.5915e4, 5e-8,  1,    False),
+    (1e-5, 1.5915e4, 5e-7,  15.9, False),
+    (1e-6, 1.5915e5, 5e-7,  1,    False),
+    (1e-6, 1.5915e5, 5e-6,  1,    False),
+    (1e-6, 1.5915e5, 5e-8,  1,    False),
+    (1e-6, 1.5915e5, 5e-7,  15.9, False),
+    (1e-7, 1.5915e6, 5e-7,  1,    False),
+    (1e-7, 1.5915e6, 5e-7,  15.9, False),
+    (1e-4, 1.5915e3, 5e-7,  1,    True),
+    (1e-5, 1.5915e4, 5e-7,  1,    True),
 ]
 
 
-# ── Path helper ──────────────────────────────────────────────────────────────
-def get_run_path(regime, ek, freq, b):
+# ── Path helper ───────────────────────────────────────────────────────────────
+def get_run_path(regime, ek, freq, b, rm):
     """Return the full path to a simulation directory."""
-    folder = f"ek{ek:.0e}_freq{freq:.3g}_b{b:.0e}"
+    folder = f"ek{ek:.0e}_freq{freq:.3g}_b{b:.0e}_rm{rm}"
     return os.path.join(SIM_DIR, regime, folder)
 
 
@@ -172,7 +176,6 @@ def load_lorentz_iw(ek, pm, is_orbital=False):
         return compute_lorentz_rms(ek, pm, ivar=30)
 
 
-
 def sci_label(ek):
     """Format an Ekman number as a LaTeX scientific-notation string."""
     exp   = int(np.floor(np.log10(ek)))
@@ -192,11 +195,11 @@ def plot_velocity_ratio():
     )
 
     # ── Panel (a): Zonal Flow ─────────────────────────────────────────────────
-    for ek, freq, b in ZF_RUNS:
+    for ek, freq, b, rm in ZF_RUNS:
         pm    = 1 / freq
         color = EK_COLORS[ek]
 
-        os.chdir(get_run_path("zonal_flow", ek, freq, b))
+        os.chdir(get_run_path("zonal_flow", ek, freq, b, rm))
         ts      = MagicTs(field="e_kin", iplot=False)
         ekin    = np.average(ts.ekin_tor_axi[-50:])
         lorentz = load_lorentz_zf(ek=ek, pm=pm)
@@ -224,12 +227,11 @@ def plot_velocity_ratio():
              fontsize=FONT_LARGE, fontweight="bold", va="top")
 
     # ── Panel (b): Inertial Wave ──────────────────────────────────────────────
-    for ek, freq, b, is_orbital in IW_RUNS:
+    for ek, freq, b, rm, is_orbital in IW_RUNS:
         pm    = 1 / freq
-        rm    = pm / (2 * np.pi * ek)
         color = EK_COLORS[ek]
 
-        os.chdir(get_run_path("inertial_wave", ek, freq, b))
+        os.chdir(get_run_path("inertial_wave", ek, freq, b, rm))
         ts      = MagicTs(field="e_kin", iplot=False)
         ekin    = np.average(ts.ekin_tot[-10:])
         lorentz = load_lorentz_iw(ek=ek, pm=pm, is_orbital=is_orbital)
@@ -239,7 +241,7 @@ def plot_velocity_ratio():
         # u_exp: estimated velocity from balancing Lorentz force against viscous force
         # (see de Langen et al., submitted)
         u_exp    = lorentz * np.sqrt(ek) * SHELL_VOLUME / SHELL_SURFACE
-        marker   = "*" if is_orbital else ("o" if round(rm, 2) == 1.00 else "s")
+        marker   = "*" if is_orbital else ("o" if rm == 1 else "s")
         dot_size = (MARKER_SIZE * 2)**2 if is_orbital else MARKER_SIZE**2
 
         ax2.scatter(lorentz * ek**2, u_exp / u_sim,
